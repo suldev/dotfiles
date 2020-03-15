@@ -46,6 +46,22 @@ xterm*highlightSelection: true
 !xterm*scrollKey:       true
 !xterm*scrollBar:       true
 
+! Rofi
+#define rofibg #90404040
+#define rofifg #f0f0f0
+rofi.fullscreen: true
+rofi.padding: 400
+rofi.width: -20
+rofi.lines: 5
+rofi.eh: 1
+rofi.hide-scrollbar: true
+rofi.separator-style: none
+rofi.font: Noto Sans 16
+rofi.fake-transparency: true
+rofi.color-window: rofibg, #000000, #000000 
+rofi.color-normal: rofibg, rofifg, rofibg, rofibg, #008cff
+rofi.color-active: rofibg, rofifg, rofibg, rofibg, #008cff
+
 ! URxvt
 URxvt.modifier: mod1
 URxvt*loginShell: true
