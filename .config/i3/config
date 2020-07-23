@@ -26,11 +26,11 @@ font pango:Noto Sans7
 # screen before suspend. Use loginctl lock-session to lock your screen.
 exec --no-startup-id xss-lock --transfer-sleep-lock -- i3lock --nofork
 
-# Wallpaper - randomly select wallpaper on startup
-exec feh --bg-scale --randomize ~/Pictures/wallpaper/*
+# Select and display wallpaper
+exec feh --bg-scale ~/Pictures/wallpaper/wallhaven-5djlz8_1920x1080.png
 # Wallpaper - set hotkey to select new random wallpaper
 # For when you just don't quite like the current one
-bindsym $mod+Shift+w exec feh --bg-scale --randomize ~/Pictures/wallpaper/*
+#bindsym $mod+Shift+w exec feh --bg-scale --randomize ~/Pictures/wallpaper/*
 
 # NetworkManager is the most popular way to manage wireless networks on Linux,
 # and nm-applet is a desktop environment-independent system tray GUI for it.
@@ -47,12 +47,19 @@ bindsym XF86AudioMicMute exec --no-startup-id pactl set-source-mute @DEFAULT_SOU
 floating_modifier $mod
 
 # start a terminal
-bindsym $mod+x exec urxvt
+bindsym $mod+x exec --no-startup-id urxvt
 
 # kill focused window
-bindsym $mod+Shift+q kill
+bindsym $mod+q kill
 
-# start dmenu (a program launcher)
+# move current workspace to next monitor
+bindsym $mod+n move workspace to output right
+
+# Take screenshot
+bindsym Print exec scrot -u -z '%Y-%m-%d_%H%M%S_scrot.png' -e 'mv $f ~/Pictures/screenshots'
+bindsym Control+Print exec scrot -u -s -z '%Y-%m-%d_%H%M%S_scrot.png' -e 'mv $f ~/Pictures/screenshots'
+
+# start dmenu (a program launcher) (how about rofi instead?)
 #bindsym $mod+d exec dmenu_run
 bindsym $mod+d exec rofi -show run
 # There also is the (new) i3-dmenu-desktop which only displays applications
@@ -99,10 +106,10 @@ bindsym $mod+w layout tabbed
 bindsym $mod+e layout toggle split
 
 # toggle tiling / floating
-bindsym $mod+Shift+space floating toggle
+bindsym $mod+space floating toggle
 
 # change focus between tiling / floating windows
-bindsym $mod+space focus mode_toggle
+#bindsym $mod+space focus mode_toggle
 
 # focus the parent container
 bindsym $mod+a focus parent
@@ -110,21 +117,24 @@ bindsym $mod+a focus parent
 # kill i3 wm
 bindsym $mod+Escape exec killall i3
 
+# power management hot keys
+bindsym $mod+Shift+s exec systemctl suspend
+
 # focus the child container
 #bindsym $mod+d focus child
 
 # Define names for default workspaces for which we configure key bindings later on.
 # We use variables to avoid repeating the names in multiple places.
-set $ws1 "1"
-set $ws2 "2"
-set $ws3 "3"
-set $ws4 "4"
-set $ws5 "5"
-set $ws6 "6"
-set $ws7 "7"
-set $ws8 "8"
-set $ws9 "9"
-set $ws10 "10"
+set $ws1 1
+set $ws2 2
+set $ws3 3
+set $ws4 4
+set $ws5 5
+set $ws6 6
+set $ws7 7
+set $ws8 8
+set $ws9 9
+set $ws10 10
 
 # switch to workspace
 bindsym $mod+1 workspace number $ws1
@@ -175,6 +185,11 @@ mode "resize" {
         bindsym Down resize grow height 10 px or 10 ppt
         bindsym Up resize shrink height 10 px or 10 ppt
         bindsym Right resize grow width 10 px or 10 ppt
+        bindsym Shift+Left resize shrink width 5 px or 5 ppt
+        bindsym Shift+Down resize grow height 5 px or 5 ppt
+        bindsym Shift+Up resize shrink height 5 px or 5 ppt
+        bindsym Shift+Right resize grow width 5 px or 5 ppt
+
 
         # back to normal: Enter or Escape or $mod+r
         bindsym Return mode "default"
@@ -185,7 +200,7 @@ mode "resize" {
 bindsym $mod+r mode "resize"
 
 # Set window borders
-default_border pixel 2
+default_border none
 default_floating_border normal
 hide_edge_borders both
 
@@ -196,9 +211,20 @@ hide_edge_borders both
 #}
 exec_always --no-startup-id $HOME/.config/polybar/startup.sh
 exec_always --no-startup-id xrdb ~/.Xresources
+exec_always --no-startup-id $HOME/.config/dunst/startup.sh
+
+#Floating window defaults
+for_window [class="^Steam&" title="^Friends$"] floating enable
 
 # Default application workspace
-assign [class="firefox"] $ws2
+#assign [class="firefox"] $ws2
+assign [class="^Steam$"] $ws8
+assign [class="discord"] $ws9
+#assign [class="spotify"] $ws10
+for_window [class="Spotify"] move to workspace $ws10
+
+# Application startup
 exec --no-startup-id firefox
-assign [class="hexchat"] $ws3
-exec --no-startup-id i3-msg 'workspace 1'
+exec --no-startup-id steam
+exec --no-startup-id discord
+exec --no-startup-id spotify 
