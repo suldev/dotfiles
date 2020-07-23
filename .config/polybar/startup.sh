@@ -2,4 +2,5 @@
 
 killall -q polybar
 
-polybar main >>$HOME/logs/polybar.log &
+polybar -r main &
+polybar -r secondary &
