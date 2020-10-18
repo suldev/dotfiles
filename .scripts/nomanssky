@@ -1,0 +1,15 @@
+#!/bin/sh
+
+# Application Directives
+APPID="275850"
+APPEXE="No Man's Sky/Binaries/NMS.exe"
+PROTON="Proton 4.11/proton"
+
+# Directory variable setup
+STEAMDIR=$HOME/.steam/root/steamapps/common
+DATA_PATH=$HOME/.steam/root/steamapps/compatdata/$APPID
+
+# Change directory to data_path and run game
+cd $DATA_PATH/pfx
+echo STEAM_COMPAT_DATA_PATH=$DATA_PATH WINEPREFIX=$PWD "$HOME/.steam/root/steamapps/common/$PROTON" run $STEAMDIR/$APPEXE 
+STEAM_COMPAT_DATA_PATH=$DATA_PATH WINEPREFIX=$PWD "$HOME/.steam/root/steamapps/common/$PROTON" run "$STEAMDIR/$APPEXE"

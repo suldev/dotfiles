@@ -1,0 +1,15 @@
+#!/bin/sh
+
+# Application Directives
+APPID="8500"
+APPEXE="Eve\ Online/Launcher/evelauncher.exe"
+
+# Directory variable setup
+PROTON="$HOME/.steam/root/steamapps/common/Proton\ 5.0/proton"
+STEAMDIR=$HOME/.steam/root/steamapps/common
+DATA_PATH=$HOME/.steam/root/steamapps/compatdata/$APPID
+
+# Change directory to data_path and run game
+cd $DATA_PATH/pfx
+echo STEAM_COMPAT_DATA_PATH=$DATA_PATH WINEPREFIX=$PWD "$HOME/.steam/root/steamapps/common/Proton 5.0/proton" run $STEAMDIR/$APPEXE 
+STEAM_COMPAT_DATA_PATH=$DATA_PATH WINEPREFIX=$PWD "$HOME/.steam/root/steamapps/common/Proton 5.0/proton" run "$STEAMDIR/$APPEXE"
