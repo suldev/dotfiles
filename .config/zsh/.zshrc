@@ -11,18 +11,23 @@ RPROMPT='${vcs_info_msg_0_}'
 alias ls='ls --color'
 alias update-grub='grub-mkconfig -o /boot/grub/grub.cfg'
 alias clear='clear && neofetch'
+alias steamgames='cd $HOME/.local/share/Steam/steamapps/common'
+alias xkill=~/scripts/xkill
+alias lsblk='lsblk --output NAME,RM,FSUSED,SIZE,FSUSE%,RO,TYPE,MOUNTPOINT'
+
 alias confi3='vim $XDG_CONFIG_HOME/i3/config'
 alias confpoly='vim $XDG_CONFIG_HOME/polybar/config'
 alias confzsh='vim $XDG_CONFIG_HOME/zsh/.zshrc'
 alias confvim='vim $XDG_CONFIG_HOME/vim/vimrc' 
-alias steamgames='cd $HOME/.local/share/Steam/steamapps/common'
-alias xkill=~/scripts/xkill
-alias lsblk='lsblk --output NAME,RM,FSUSED,SIZE,FSUSE%,RO,TYPE,MOUNTPOINT'
 alias confneo='vim $XDG_CONFIG_HOME/neofetch/config.conf'
+alias confmutt='vim $XDG_CONFIG_HOME/neomutt/muttrc'
 
 # History in cache directory
 HISTSIZE=10000
 SAVEHIST=10000
+setopt appendhistory
+setopt sharehistory
+setopt incappendhistory
 
 # Tab complete
 autoload -U compinit
@@ -93,6 +98,8 @@ if [[ "${terminfo[kcud1]}" != "" ]]; then
 	zle -N down-line-or-beginning-search
 	bindkey "${terminfo[kcud1]}" down-line-or-beginning-search
 fi
+
+source /usr/share/nvm/init-nvm.sh
 
 #update .vimrc file pointer
 export VIMINIT='let $MYVIMRC="$XDG_CONFIG_HOME/vim/vimrc" | source $MYVIMRC'
