@@ -1,0 +1,7 @@
+#
+### Newsboat RSS Feed
+### Configuration File
+#
+
+# Set default RSS Feed browser to Firefox
+browser firefox

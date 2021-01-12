@@ -1,0 +1,24 @@
+#!/bin/sh
+
+WIDTH=${WIDTH:-200}
+HEIGHT=${HEIGHT:-200}
+
+# the position of the upper left corner of the popup
+eval $(xdotool getmouselocation --shell)
+posX=$(($X - $WIDTH))
+posY=$(($Y))
+
+exec yad --calendar \
+    --width=$WIDTH \
+    --height=$HEIGHT \
+    --undecorated \
+    --no-buttons \
+    --fixed \
+    --close-on-unfocus \
+    --posx=$posX \
+    --posy=$posY \
+#    --button="Today":0 --buttons-layout=center
+    > /dev/null
+
+echo "$LABEL$(date "$DATEFMT")"
+echo "$LABEL$(date "$SHORTFMT")"
