@@ -1,0 +1,108 @@
+services:
+  portainer:
+    image: portainer/portainer-ce
+    container_name: portainer
+    ports:
+      - 5555:9443
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - /var/lib/docker/volumes/portainer_data:/data
+    profiles:
+      - base
+      - production-all
+      - production-cloud
+      - production-git
+
+  proxy:
+    image: jwilder/nginx-proxy:alpine
+    labels:
+      - "com.github.jrcs.letsencrypt_nginx_proxy_companion.nginx_proxy=true"
+    container_name: revproxy-prod
+    networks:
+      - slowcat_net
+    ports:
+      - 80:80
+      - 443:443
+    volumes:
+      - /srv/nginx/reverse-proxy/conf.d:/etc/nginx/conf.d:rw  
+      - /srv/nginx/reverse-proxy/vhost.d:/etc/nginx/vhost.d:rw
+      - /srv/nginx/reverse-proxy/html:/usr/share/nginx/html:rw
+      - /srv/nginx/reverse-proxy/certs:/etc/nginx/certs:ro    
+      - /etc/localtime:/etc/localtime:ro
+      - /var/run/docker.sock:/tmp/docker.sock:ro
+    environment:
+      - VIRTUAL_PROTO=https
+      - VIRTUAL_PORT=443
+    restart: unless-stopped
+    profiles:
+      - base
+  
+  cryptserv:
+    image: linuxserver/letsencrypt
+    container_name: cryptserv-prod
+    networks:
+      - slowcat_net
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - URL=domain-here.com
+      - SUBDOMAINS=www,nextcloud
+      - VALIDATION=http
+      #- DNSPLUGIN=cloudflare #optional
+      #- PROPAGATION= #optional
+      #- DUCKDNSTOKEN= #optional
+      #- EMAIL= #optional
+      #- ONLY_SUBDOMAINS=false #optional
+      #- EXTRA_DOMAINS= #optional
+      #- STAGING=false #optional
+    volumes:
+      - /srv/crypt/config:/config
+      - /etc/localtime:/etc/localtime:ro
+    restart: unless-stopped
+
+  db:
+    image: mariadb
+    container_name: mariadb-nextcloud-prod
+    networks:
+      - slowcat_net
+    volumes:
+      - /srv/cloud/db:/var/lib/mysql
+      - /etc/localtime:/etc/localtime:ro
+    environment:
+      - MYSQL_ROOT_PASSWORD=
+      - MYSQL_PASSWORD=
+      - MYSQL_DATABASE=nextcloud
+      - MYSQL_USER=nextcloud
+    restart: unless-stopped
+  
+  cloud:
+    image: nextcloud
+    container_name: nextcloud-prod
+    networks:
+      - slowcat_net
+    depends_on:
+      - proxy
+      - cryptserv
+      - db
+    volumes:
+      - nextcloud:/var/www/html
+      - /srv/cloud/config:/var/www/html/config
+      - /srv/cloud/custom_apps:/var/www/html/custom_apps
+      - /srv/cloud/data:/var/www/html/data
+      - /srv/cloud/themes:/var/www/html/themes
+      - /etc/localtime:/etc/localtime:ro
+    environment:
+      - VIRTUAL_HOST=nextcloud.slowcatlabs.com
+      - LETSENCRYPT_HOST=ssl.slowcatlabs.com
+      - LETSENCRYPT_EMAIL=suleyk.dev@gmail.com
+    restart: unless-stopped
+    profiles:
+      - production-all
+      - production-cloud
+
+volumes:
+  nextcloud:
+  db:
+
+networks:
+  slowcat_net: {}

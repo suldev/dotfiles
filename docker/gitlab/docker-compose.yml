@@ -1,0 +1,106 @@
+services:
+  portainer:
+    image: portainer/portainer-ce
+    container_name: portainer
+    ports:
+      - 5555:9443
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - /var/lib/docker/volumes/portainer_data:/data
+    profiles:
+      - base
+      - production-all
+      - production-cloud
+      - production-git
+
+  proxy:
+    image: jwilder/nginx-proxy:alpine
+    labels:
+      - "com.github.jrcs.letsencrypt_nginx_proxy_companion.nginx_proxy=true"
+    container_name: revproxy-prod
+    networks:
+      - slowcat_net
+    ports:
+      - 80:80
+      - 443:443
+    volumes:
+      - /srv/nginx/reverse-proxy/conf.d:/etc/nginx/conf.d:rw  
+      - /srv/nginx/reverse-proxy/vhost.d:/etc/nginx/vhost.d:rw
+      - /srv/nginx/reverse-proxy/html:/usr/share/nginx/html:rw
+      - /srv/nginx/reverse-proxy/certs:/etc/nginx/certs:ro    
+      - /etc/localtime:/etc/localtime:ro
+      - /var/run/docker.sock:/tmp/docker.sock:ro
+    environment:
+      - VIRTUAL_PROTO=https
+      - VIRTUAL_PORT=443
+    restart: unless-stopped
+    profiles:
+      - base
+  
+  cryptserv:
+    image: linuxserver/letsencrypt
+    container_name: cryptserv-prod
+    networks:
+      - slowcat_net
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - URL=domain-here.com
+      - SUBDOMAINS=www,nextcloud
+      - VALIDATION=http
+      #- DNSPLUGIN=cloudflare #optional
+      #- PROPAGATION= #optional
+      #- DUCKDNSTOKEN= #optional
+      #- EMAIL= #optional
+      #- ONLY_SUBDOMAINS=false #optional
+      #- EXTRA_DOMAINS= #optional
+      #- STAGING=false #optional
+    volumes:
+      - /srv/crypt/config:/config
+      - /etc/localtime:/etc/localtime:ro
+    restart: unless-stopped
+
+  db:
+    image: mariadb
+    container_name: mariadb-nextcloud-prod
+    networks:
+      - slowcat_net
+    volumes:
+      - /srv/cloud/db:/var/lib/mysql
+      - /etc/localtime:/etc/localtime:ro
+    environment:
+      - MYSQL_ROOT_PASSWORD=
+      - MYSQL_PASSWORD=
+      - MYSQL_DATABASE=nextcloud
+      - MYSQL_USER=nextcloud
+    restart: unless-stopped
+  
+  build-server:
+    image: gitlab/gitlab-ce:latest
+    container_name: gitlab
+    hostname: 'devs.slowcatlabs.com'
+    environment:
+      GITLAB_OMNIBUS_CONFIG: |
+        external_url 'https://dev.slowcatlabs.com'
+        gitlab_rails['initial_root_password'] = File.read('/srv/gitlab/root_passwd').gsub("\n","")
+    ports:
+      - 8888:443
+      - 8866:22
+    volumes:
+      - /srv/gitlab/config:/etc/gitlab
+      - /srv/gitlab/logs:/var/log/gitlab
+      - /srv/gitlab/data:/var/opt/gitlab
+    shm_size: '256m'
+    restart: unless-stopped
+    secrets:
+      - /srv/gitlab/root_passwd
+    profiles:
+      - production-all
+      - production-git
+
+volumes:
+  nextcloud:
+  db:
+
+networks:
+  slowcat_net: {}
