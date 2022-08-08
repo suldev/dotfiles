@@ -1,10 +1,6 @@
 version: '3'
 
 services:
-  redis:
-    image: redis:alpine
-    restart: always
-
   proxy:
     build: ./proxy
     restart: always
@@ -13,33 +9,58 @@ services:
       - 443:443
     labels:
       com.github.jrcs.letsencrypt_nginx_proxy_companion.nginx_proxy: "true"
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 512M
+        reservations:
+          cpus: '0.1'
+          memory: 64M
     volumes:
-      - certs:/etc/nginx/certs:ro
-      - vhost.d:/etc/nginx/vhost.d
-      - html:/usr/share/nginx/html
+      - /var/lib/volumes/base/certs:/etc/nginx/certs:ro
+      - /var/lib/volumes/base/vhost.d:/etc/nginx/vhost.d
+      - /var/lib/volumes/base/html:/usr/share/nginx/html
       - /var/run/docker.sock:/tmp/docker.sock:ro
     networks:
-      - proxy-tier
+      - external-proxy
 
-  letsencrypt-companion:
+  crypto:
     image: nginxproxy/acme-companion
     restart: always
     volumes:
-      - certs:/etc/nginx/certs
-      - acme:/etc/acme.sh
-      - vhost.d:/etc/nginx/vhost.d
-      - html:/usr/share/nginx/html
+      - /var/lib/volumes/base/certs:/etc/nginx/certs
+      - /var/lib/volumes/base/acme:/etc/acme.sh
+      - /var/lib/volumes/base/vhost.d:/etc/nginx/vhost.d
+      - /var/lib/volumes/base/html:/usr/share/nginx/html
+      - /root/.secrets/google.json:/gcloud-service-account.json:ro
       - /var/run/docker.sock:/var/run/docker.sock:ro
     networks:
-      - proxy-tier
+      - external-proxy
     depends_on:
       - proxy
+
+  portainer:
+    image: portainer/portainer-ce
+    container_name: portainer
+    restart: unless-stopped
+    ports:
+      - 5555:9443
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - /var/lib/docker/volumes/portainer_data:/data
+    networks:
+      - internal
 
 volumes:
   certs:
   acme:
   vhost.d:
   html:
+  portainer_data:
 
 networks:
-  proxy-tier:
+  external-proxy:
+    external: true
+  internal:
+    external: true
