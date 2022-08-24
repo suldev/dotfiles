@@ -3,8 +3,9 @@ services:
     image: lscr.io/linuxserver/transmission:latest
     restart: unless-stopped
     container_name: transmission
-    env_file: 
-      - transmission.env
+    environments:
+      - PUID=
+      - PGID=
     volumes:
       - /srv/transmission/config:/config
       - /srv/transmission/downloads:/downloads

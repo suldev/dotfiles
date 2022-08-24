@@ -1,0 +1,21 @@
+services:
+  syslog:
+    image: lscr.io/linuxserver/syslog-ng:latest
+    restart: unless-stopped
+    environment:
+      - PUID=
+      - PGID=
+    volumes:
+      - /etc/localtime:/etc/localtime:ro
+      - /srv/syslog/config:/config
+      - /srv/syslog/log:/var/log
+    ports:
+      - 514:514/udp
+      - 601:601/tcp
+      - 6514:6514/tcp
+    networks:
+      - internal
+
+networks:
+  internal:
+    external: true

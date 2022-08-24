@@ -12,27 +12,31 @@ services:
     deploy:
       resources:
         limits:
-          cpus: '0.5'
+          cpus: '0.25'
           memory: 512M
         reservations:
           cpus: '0.1'
           memory: 64M
     volumes:
-      - /var/lib/volumes/base/certs:/etc/nginx/certs:ro
-      - /var/lib/volumes/base/vhost.d:/etc/nginx/vhost.d
-      - /var/lib/volumes/base/html:/usr/share/nginx/html
+      - /srv/base/certs:/etc/nginx/certs:ro
+      - /srv/base/vhost.d:/etc/nginx/vhost.d
+      - /srv/base/html:/usr/share/nginx/html
+      - /srv/base/config:/etc/nginx/conf.d
       - /var/run/docker.sock:/tmp/docker.sock:ro
     networks:
       - external-proxy
 
-  crypto:
+  crypt:
     image: nginxproxy/acme-companion
     restart: always
+    environment:
+      - DEFAULT_EMAIL=
     volumes:
-      - /var/lib/volumes/base/certs:/etc/nginx/certs
-      - /var/lib/volumes/base/acme:/etc/acme.sh
-      - /var/lib/volumes/base/vhost.d:/etc/nginx/vhost.d
-      - /var/lib/volumes/base/html:/usr/share/nginx/html
+      - /srv/base/certs:/etc/nginx/certs
+      - /srv/base/vhost.d:/etc/nginx/vhost.d
+      - /srv/base/html:/usr/share/nginx/html
+      - /srv/base/config:/etc/nginx/conf.d:ro
+      - acme:/etc/acme.sh
       - /root/.secrets/google.json:/gcloud-service-account.json:ro
       - /var/run/docker.sock:/var/run/docker.sock:ro
     networks:
@@ -40,27 +44,12 @@ services:
     depends_on:
       - proxy
 
-  portainer:
-    image: portainer/portainer-ce
-    container_name: portainer
-    restart: unless-stopped
-    ports:
-      - 5555:9443
-    volumes:
-      - /var/run/docker.sock:/var/run/docker.sock
-      - /var/lib/docker/volumes/portainer_data:/data
-    networks:
-      - internal
-
 volumes:
   certs:
   acme:
   vhost.d:
   html:
-  portainer_data:
 
 networks:
   external-proxy:
-    external: true
-  internal:
     external: true

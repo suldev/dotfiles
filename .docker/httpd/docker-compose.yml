@@ -1,0 +1,22 @@
+services:
+  apache:
+    image: 'bitnami/apache:latest'
+    ports:
+      - '8080:8080'
+      - '8443:8443'
+    environment:
+      - APACHE_HTTP_PORT_NUMBER=
+      - APACHE_HTTPS_PORT_NUMBER=
+      - VIRTUAL_HOST=
+      - LETSENCRYPT_HOST=
+      - LETSENCRYPT_EMAIL=
+    volumes:
+      - /srv/httpd/data:/app
+      - /srv/httpd/config/httpd.conf:/opt/binami/apache/conf/httpd.conf
+      - /srv/httpd/config/my_vhost.conf:/vhosts/my_vhost.conf:ro
+      - /srv/base/certs:/certs
+    networks:
+      - external-proxy
+networks:
+  external-proxy:
+    external: true

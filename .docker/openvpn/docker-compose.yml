@@ -1,0 +1,37 @@
+version: "2.1"
+services:
+  wireguard:
+    image: lscr.io/linuxserver/wireguard:latest
+    container_name: wireguard
+    restart: unless-stopped
+    cap_add:
+      - NET_ADMIN
+      - SYS_MODULE
+    environment:
+      - PUID=
+      - PGID=
+      - TZ=
+      - VIRTUAL_HOST=
+      - VIRTUAL_PORT=
+      - LETSENCRYPT_HOST=
+      - LETSENCRYPT_EMAIL=
+      - SERVERURL= #optional
+      - SERVERPORT= #optional
+      - PEERS= #optional
+      - PEERDNS= #optional
+      - INTERNAL_SUBNET= #optional
+      - ALLOWEDIPS= #optional
+      - LOG_CONFS= #optional
+    volumes:
+      - /srv/openvpn/config:/config
+      - /usr/src:/usr/src:ro
+      - /lib/modules:/lib/modules
+    ports:
+      - 37892:51820/udp
+    sysctls:
+      - net.ipv4.conf.all.src_valid_mark=1
+    networks:
+      - external-proxy
+networks:
+  external-proxy:
+    external: true
