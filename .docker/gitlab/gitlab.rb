@@ -1288,8 +1288,8 @@ redis['maxmemory_samples'] = "5"
 ### Redis TLS settings
 ###! To run Redis over TLS, specify values for the following settings
 redis['tls_port'] = 6379
-redis['tls_cert_file'] = '/etc/gitlab/ssl/gitlab.slowcatlabs.com.crt'
-redis['tls_key_file'] = '/etc/gitlab/ssl/gitlab.slowcatlabs.com.key'
+redis['tls_cert_file'] = ''
+redis['tls_key_file'] = ''
 
 ###! Other TLS related optional settings
 # redis['tls_dh_params_file'] = nil
