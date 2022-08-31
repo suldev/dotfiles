@@ -1,0 +1,38 @@
+version: '3'
+
+services:
+  portainer:
+    image: portainer/portainer-ce
+    restart: always
+    ports:
+      - 5555:9443
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - portainer:/data
+    networks:
+      - internal
+        # TODO: Setup an internal ssl
+
+  transmission:
+    image: lscr.io/linuxserver/transmission:latest
+    restart: always
+    volumes:
+      - config:/config
+      - watch:/watch
+      - /srv/transmission/downloads:/downloads
+      - /etc/localtime:/etc/localtime:ro
+    ports:
+      - 9091:9091
+      - 51413:51413
+      - 51413:51413/udp
+    networks:
+      - internal
+
+volumes:
+  portainer:
+  config:
+  watch:
+      
+networks:
+  internal:
+    external: true

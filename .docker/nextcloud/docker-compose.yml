@@ -6,50 +6,59 @@ services:
     command: --transaction-isolation=READ-COMMITTED --binlog-format=ROW
     restart: always
     volumes:
-      - /srv/cloud/db:/var/lib/mysql
-      - /etc/localtime:/etc/localtime:ro
+      - /srv/prd/cloud/db:/var/lib/mysql
     environment:
-      - MYSQL_DATABASE=
-      - MYSQL_USER=
-      - MYSQL_PASSWORD=
       - MYSQL_ROOT_PASSWORD=
+    env_file:
+      - db.env
     networks:
-      - internal
+      - nextcloud-internal
 
   redis:
     image: redis:alpine
     restart: always
-    volumes:
-      - /etc/localtime:/etc/localtime:ro
-    command: redis-server --save 20 1 --loglevel warning --requirepass 70DF6DB40896D9BAB1E83700B93C04A1
     networks:
-      - internal
+      - nextcloud-internal
 
-  webapp:
+  app:
+    build: .
     image: nextcloud:apache
-    restart: unless-stopped
+    restart: always
     volumes:
-      - /srv/cloud/nextcloud:/var/www/html
+      - /srv/prd/cloud/html:/var/www/html
       - /etc/localtime:/etc/localtime:ro
     environment:
       - VIRTUAL_HOST=
       - LETSENCRYPT_HOST=
       - LETSENCRYPT_EMAIL=
-      - MYSQL_DATABASE=
-      - MYSQL_USER=
-      - MYSQL_HOST=
-      - MYSQL_PASSWORD=
-      - REDIS_HOST=
-      - REDIS_PASSWORD=
+      - MYSQL_HOST=db
+      - REDIS_HOST=redis
+    env_file:
+      - db.env
     depends_on:
       - db
       - redis
     networks:
-      - external-proxy
-      - internal
+      - nextcloud-proxy
+      - nextcloud-internal
 
+  cron:
+    image: nextcloud:apache
+    restart: always
+    volumes:
+      - /srv/prd/cloud:/var/www/html
+    entrypoint: /cron.sh
+    depends_on:
+      - db
+      - redis
+    networks:
+      - nextcloud-internal
+
+volumes:
+  db:
+  
 networks:
-  external-proxy:
+  nextcloud-proxy:
     external: true
-  internal:
+  nextcloud-internal:
     external: true

@@ -1,0 +1,77 @@
+services:
+  nginx:
+    build: ./proxy
+    restart: always
+    ports:
+      - 80:80
+      - 443:443
+    labels:
+      com.github.jrcs.letsencrypt_nginx_proxy_companion.nginx_proxy: "true"
+    deploy:
+      resources:
+        limits:
+          cpus: '0.1'
+          memory: 512M
+        reservations:
+          cpus: '0.01'
+          memory: 64M
+    volumes:
+      - certs:/etc/nginx/certs:ro
+      - vhost:/etc/nginx/vhost.d
+      - html:/usr/share/nginx/html
+      - /var/run/docker.sock:/tmp/docker.sock:ro
+    networks:
+      - nextcloud-proxy
+      - www-proxy
+      - ssl-bridge
+
+  ssl:
+    image: nginxproxy/acme-companion
+    restart: always
+    environment:
+      - DEFAULT_EMAIL=suleyk.dev@gmail.com
+    volumes:
+      - certs:/etc/nginx/certs
+      - vhost:/etc/nginx/vhost.d
+      - html:/usr/share/nginx/html
+      - acme:/etc/acme.sh
+      - /root/.secrets/google.json:/gcloud-service-account.json:ro
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+    depends_on:
+      - nginx
+    networks:
+      - ssl-bridge
+  
+  syslog:
+    image: lscr.io/linuxserver/syslog-ng:latest
+    restart: unless-stopped
+    environment:
+      - PUID=1000
+      - PGID=1000
+    volumes:
+      - /etc/localtime:/etc/localtime:ro
+      - config:/config
+      - /srv/syslog/log:/var/log
+    ports:
+      - 5514:5514/udp
+      - 6601:6601/tcp
+      - 6514:6514/tcp
+    networks:
+      - syslog-internal
+
+volumes:
+  certs:
+  vhost:
+  html:
+  acme:
+  config:
+      
+networks:
+  nextcloud-proxy:
+    external: true
+  www-proxy:
+    external: true
+  ssl-bridge:
+    external: true
+  syslog-internal:
+    external: true
