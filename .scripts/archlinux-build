@@ -8,59 +8,55 @@ HOME_PERMISSIONS=644
 ##! Initially, make sure the machine is up-to-date
 ##! We'll be using pacman a lot, so best to be sure the system is functioning
 cd $HOME
-sudo pacman -Syu --noconfirm > $LOG
-if [[ "$?" != 0 ]]; then
-  echo "Pacman FAILED to update"
-  goto EOF
+sudo pacman -Syu --noconfirm 
+if [[ "$?" == 0 ]]; then
+	##! Skip the following sections after relogging
+	if [[ -f $LOG ]]; then
+		##! Second time running
+		cd $HOME
+		mkdir -p $XDG_CONFIG_HOME/neofetch
+		mkdir -p $XDG_CONFIG_HOME/vim
+		mkdir -p $XDG_CONFIG_HOME/zsh
+		mkdir $XDG_CACHE_HOME
+		mkdir -p $XDG_DATA_HOME/vim/undo
+		mkdir -p $XDG_DATA_HOME/vim/backup
+		mkdir -p $XDG_DATA_HOME/vim/view
+		mkdir $XDG_STATE_HOME
+
+		##! Obtain needed applications
+		sudo pacman -S --quiet --needed --noconfirm zsh i3-gaps dunst ranger vim neofetch fakeroot git
+
+		##! Fetch and install AUR applications
+		pushd git/
+			git clone https://aur.archlinux.org/polybar-git.git
+			pushd polybar
+    				makepkg -si
+  			popd 
+		popd
+		cp -rv $ROOT/.scripts $HOME
+		cp -rv $ROOT/.config $XDG_CONFIG_HOME
+
+		##! Configure file permissions
+		sudo chown -r $USERNAME $HOME
+		sudo chgrp -r $USERGRP $HOME
+		chmod -r $HOME_PERMISSIONS $HOME
+
+		##! Complete, cleanup
+		rm $LOG
+		sudo reboot
+	else
+		##! First time run
+		##! Set up xdg
+		touch $LOG
+		cp $ROOT\.zshenv $HOME
+		chsh -s /bin/zsh
+		##! Set up folder directory
+		mkdir dox
+		mkdir pix
+		mkdir vid
+		mkdir dl
+		echo "Step (1/2) complete. Please relog and rerun this script"
+		sleep 1
+else
+  echo "Failed init start"
 fi
-
-##! Skip the following sections after relogging
-if [[ -f $LOG ]]; then
-  goto AfterBoot
-fi
-
-##! Set up xdg
-cp $ROOT\.zshenv $HOME
-echo "Step (1/2) complete. Please relog and rerun this script"
-goto EOF
-
-##! Set up folder directory
-mkdir dox
-mkdir pix
-mkdir vid
-mkdir dl
-mkdir -p $XDG_CONFIG_HOME/neofetch
-mkdir -p $XDG_CONFIG_HOME/vim
-mkdir -p $XDG_CONFIG_HOME/zsh
-mkdir $XDG_CACHE_HOME
-mkdir -p $XDG_DATA_HOME/vim/undo
-mkdir -p $XDG_DATA_HOME/vim/backup
-mkdir -p $XDG_DATA_HOME/vim/view
-mkdir $XDG_STATE_HOME
-
-:AfterBoot
-cd $HOME
-
-##! Obtain needed applications
-sudo pacman -S --needed --noconfirm git >> $LOG
-sudo pacman -S --needed --noconfirm zsh i3-gaps dunst ranger vim neofetch >> $LOG
-sudo pacman -S --needed --noconfirm fakesudo
-
-##! Fetch and install AUR applications
-pushd git/
-  git clone https://aur.archlinux.org/polybar-git.git
-  pushd polybar
-    makepkg -si
-  popd 
-popd
-cp -rv $ROOT/.scripts $HOME
-cp -rv $ROOT/.config $XDG_CONFIG_HOME
-
-##! Configure file permissions
-sudo chown -r $USERNAME $HOME
-sudo chgrp -r $USERGRP $HOME
-chmod -r 644 $HOME
-
-##! Complete, cleanup
-sudo reboot
-:EOF
