@@ -1,2 +1,2 @@
 #!/bin/sh
-rclone --vfs-cache-mode full mount onedrive: /home/suleyk/onedrive &
+rclone --vfs-cache-mode full mount onedrive: $HOME/onedrive &
