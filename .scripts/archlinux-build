@@ -13,7 +13,6 @@ if [[ "$?" == 0 ]]; then
 	##! Skip the following sections after relogging
 	if [[ -f $LOG ]]; then
 		##! Second time running
-		cd $HOME
 		mkdir -p $XDG_CONFIG_HOME/neofetch
 		mkdir -p $XDG_CONFIG_HOME/vim
 		mkdir -p $XDG_CONFIG_HOME/zsh
@@ -22,17 +21,17 @@ if [[ "$?" == 0 ]]; then
 		mkdir -p $XDG_DATA_HOME/vim/backup
 		mkdir -p $XDG_DATA_HOME/vim/view
 		mkdir $XDG_STATE_HOME
+		mkdir $HOME/git
 
 		##! Obtain needed applications
-		sudo pacman -S --quiet --needed --noconfirm zsh i3-gaps dunst ranger vim neofetch fakeroot git
+		sudo pacman -S --needed --noconfirm i3-gaps dunst ranger vim neofetch fakeroot 
 
 		##! Fetch and install AUR applications
-		pushd git/
-			git clone https://aur.archlinux.org/polybar-git.git
-			pushd polybar
-    				makepkg -si
-  			popd 
-		popd
+		cd $HOME/git
+		git clone https://aur.archlinux.org/polybar-git.git
+		pushd polybar
+    			makepkg -si
+  		popd 
 		cp -rv $ROOT/.scripts $HOME
 		cp -rv $ROOT/.config $XDG_CONFIG_HOME
 
@@ -48,15 +47,20 @@ if [[ "$?" == 0 ]]; then
 		##! First time run
 		##! Set up xdg
 		touch $LOG
-		cp $ROOT\.zshenv $HOME
+
+		##! Initial application install
+		sudo pacman -S --needed --noconfirm git zsh
+
+		cp -v $ROOT/.zshenv $HOME
 		chsh -s /bin/zsh
 		##! Set up folder directory
-		mkdir dox
-		mkdir pix
-		mkdir vid
-		mkdir dl
+		mkdir $HOME/dox
+		mkdir $HOME/pix
+		mkdir $HOME/vid
+		mkdir $HOME/dl
 		echo "Step (1/2) complete. Please relog and rerun this script"
 		sleep 1
+	fi
 else
   echo "Failed init start"
 fi
