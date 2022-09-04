@@ -13,6 +13,12 @@ if [[ "$?" == 0 ]]; then
 	##! Skip the following sections after relogging
 	if [[ -f $LOG ]]; then
 		##! Second time running
+		echo -e "\e[36m[2/2] building home directory...\e[0m"
+		sleep 1
+		mkdir $HOME/dox
+		mkdir $HOME/pix
+		mkdir $HOME/vid
+		mkdir $HOME/dl
 		mkdir -p $XDG_CONFIG_HOME/neofetch
 		mkdir -p $XDG_CONFIG_HOME/vim
 		mkdir -p $XDG_CONFIG_HOME/zsh
@@ -24,9 +30,13 @@ if [[ "$?" == 0 ]]; then
 		mkdir $HOME/git
 
 		##! Obtain needed applications
+		echo -e "\e[36m[2/2] pulling needed applications from repo\e[0m"
+		sleep 1
 		sudo pacman -S --needed --noconfirm i3-gaps dunst ranger vim neofetch fakeroot 
 
 		##! Fetch and install AUR applications
+		echo -e "\e[36m[2/2] pulling needed applications from AUR\e[0m"
+		sleep 1
 		cd $HOME/git
 		git clone https://aur.archlinux.org/polybar-git.git
 		pushd polybar
@@ -36,29 +46,34 @@ if [[ "$?" == 0 ]]; then
 		cp -rv $ROOT/.config $XDG_CONFIG_HOME
 
 		##! Configure file permissions
-		sudo chown -r $USERNAME $HOME
-		sudo chgrp -r $USERGRP $HOME
-		chmod -r $HOME_PERMISSIONS $HOME
+		#sudo chown -r $USERNAME $HOME
+		#sudo chgrp -r $USERGRP $HOME
+		#chmod -r $HOME_PERMISSIONS $HOME
 
 		##! Complete, cleanup
+		echo -e "\e[36m[2/2] build complete! Cleaning up and restarting\e[0m"
+		sleep 1
 		rm $LOG
 		sudo reboot
 	else
 		##! First time run
 		##! Set up xdg
+		echo -e "\e[36m[1/2] Welcome! Starting up suleyk's build...\e[0m"
+		sleep 1
 		touch $LOG
 
 		##! Initial application install
+		echo -e "\e[36m[1/2] Building git and zsh shell\e[0m"
+		sleep 1
 		sudo pacman -S --needed --noconfirm git zsh
-
+		
+		echo -e "\e[36m[1/2] Copying zsh environment file\e[0m"
 		cp -v $ROOT/.zshenv $HOME
+
+		echo -e "\e[36m[1/2] Changing interactive shell to zsh\e[0m"
 		chsh -s /bin/zsh
 		##! Set up folder directory
-		mkdir $HOME/dox
-		mkdir $HOME/pix
-		mkdir $HOME/vid
-		mkdir $HOME/dl
-		echo "Step (1/2) complete. Please relog and rerun this script"
+		echo -e "\e[36m[1/2] Initial build complete. Please relog and rerun this script\e[0m"
 		sleep 1
 	fi
 else
