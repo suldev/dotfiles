@@ -1,6 +1,5 @@
 #!/bin/sh
 ROOT=$PWD/..
-LOG=$HOME/build.log
 
 ##! Initially, make sure the machine is up-to-date
 ##! We'll be using pacman a lot, so best to be sure the system is functioning
@@ -9,26 +8,23 @@ if [[ "$?" == 0 ]]; then
 	##! Skip the following sections after relogging
 	##! First time run
 	##! Set up xdg
-	echo -e "\e[36m[1/10] Welcome! Starting up suleyk's build...\e[0m"
+	echo -e "\e[36m[1/8] Welcome! Starting up suleyk's build...\e[0m"
 	sleep 1
-	touch $LOG
 
-	##! Initial application install
-	echo -e "\e[36m[2/10] Building git and zsh shell\e[0m"
+	##! Install git for pulling AUR and zsh as the default shell
+	echo -e "\e[36m[2/8] Building git and zsh shell\e[0m"
 	sleep 1
 	sudo pacman -S --needed --noconfirm git zsh
-	
-	echo -e "\e[36m[3/10] Copying zsh environment file\e[0m"
+	echo -e "\e[36m[3/8] Copying zsh environment file\e[0m"
 	cp -v $ROOT/.zshenv $HOME
 	source $ROOT/.zshenv
-
-	echo -e "\e[36m[4/10] Changing interactive shell to zsh\e[0m"
+	
+	##! Change default shell
+	echo -e "\e[36m[4/8] Changing interactive shell to zsh\e[0m"
 	chsh -s /bin/zsh
+
 	##! Set up folder directory
-	echo -e "\e[36m[5/10] Initial build complete. Please relog and rerun this script\e[0m"
-	sleep 1
-	##! Second time running
-	echo -e "\e[36m[6/10] building home directory...\e[0m"
+	echo -e "\e[36m[5/8] building home directory...\e[0m"
 	sleep 1
 	mkdir $HOME/dox
 	mkdir $HOME/pix
@@ -43,15 +39,14 @@ if [[ "$?" == 0 ]]; then
 	mkdir -p $XDG_DATA_HOME/vim/view
 	mkdir $XDG_STATE_HOME
 	mkdir $HOME/git
-	echo -e "\e[36m[7/10] Configuring applications\e[0m"
 
 	##! Obtain needed applications
-	echo -e "\e[36m[8/10] pulling needed applications from repo\e[0m"
+	echo -e "\e[36m[6/8] pulling needed applications from repo\e[0m"
 	sleep 1
 	sudo pacman -S --needed --noconfirm i3-gaps dunst ranger vim neofetch fakeroot 
 
 	##! Fetch and install AUR applications
-	echo -e "\e[36m[9/10] pulling needed applications from AUR\e[0m"
+	echo -e "\e[36m[7/8] pulling needed applications from AUR\e[0m"
 	sleep 1
 	cd $HOME/git
 	git clone https://aur.archlinux.org/polybar-git.git
@@ -61,15 +56,9 @@ if [[ "$?" == 0 ]]; then
 	cp -rv $ROOT/.scripts $HOME
 	cp -rv $ROOT/.config $HOME
 
-	##! Configure file permissions
-	#sudo chown -r $USERNAME $HOME
-	#sudo chgrp -r $USERGRP $HOME
-	#chmod -r $HOME_PERMISSIONS $HOME
-
 	##! Complete, cleanup
-	echo -e "\e[36m[10/10] build complete! Cleaning up and restarting\e[0m"
+	echo -e "\e[36m[8/8] build complete! Cleaning up and restarting\e[0m"
 	sleep 1
-	rm $LOG
 else
   echo "Failed init start"
 fi
