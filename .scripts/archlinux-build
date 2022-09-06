@@ -28,6 +28,9 @@ if [[ "$?" == 0 ]]; then
 		mkdir -p $XDG_DATA_HOME/vim/view
 		mkdir $XDG_STATE_HOME
 		mkdir $HOME/git
+		echo -e "\e[36m[2/2] Configuring applications\e[0m"
+		cp -r $ROOT/.config $XDG_CONFIG_HOME
+
 
 		##! Obtain needed applications
 		echo -e "\e[36m[2/2] pulling needed applications from repo\e[0m"
