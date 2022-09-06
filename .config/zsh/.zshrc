@@ -8,7 +8,7 @@ zstyle ':vcs_info:git:*' formats '('%{$fg[green]%}%B'%b'%{$reset_color%}')'
 setopt prompt_subst
 PROMPT='%B%{$fg[green]%}%n%b%{$reset_color%}@%{$fg[cyan]%}%M %B%{$fg[yellow]%}%~%b$ '
 RPROMPT='${vcs_info_msg_0_}'
-alias ls='ls --color'
+alias ls='ls -lA --color'
 alias update-grub='grub-mkconfig -o /boot/grub/grub.cfg'
 alias clear='clear && neofetch'
 alias steamgames='cd $HOME/.local/share/Steam/steamapps/common'
