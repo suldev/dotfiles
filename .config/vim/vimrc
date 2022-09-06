@@ -1,5 +1,10 @@
+syntax on
+let mapleader = " "
 set nocompatible
-filetype off
+filetype indent plugin on
+set number relativenumber
+set laststatus=2
+set noshowmode
 
 " Set XDG directories
 set undodir=$XDG_DATA_HOME/vim/undo
@@ -9,25 +14,22 @@ set viewdir=$XDG_DATA_HOME/vim/view
 set viminfo+='1000,n$XDG_DATA_HOME/vim/viminfo
 set runtimepath=$XDG_CONFIG_HOME/vim,$VIMRUNTIME,$XDG_CONFIG_HOME/vim/after
 
-" set the runtime path to include Vundle
-" ~/.vim/bundle/Vundle.vim
-set rtp+=/home/suleyk/.vim/bundle/Vundle.vim
+" Vundle Plugins
+set rtp+=$XDG_CONFIG_HOME/vim/bundle/vundle
+call vundle#rc("$XDG_CONFIG_HOME/vim/bundle")
 call vundle#begin()
+Plugin 'gmarik/Vundle.vim'
+Plugin 'scrooloose/nerdtree'
+Plugin 'jiangmiao/auto-pairs'
 Plugin 'ycm-core/YouCompleteMe'
+Plugin 'itchyny/lightline.vim'
 call vundle#end()
-filetype plugin indent on
 
-set number relativenumber
-syntax on
-
-let mapleader = " "
-call plug#begin('~/.vim/plugged')
-Plug 'junegunn/goyo.vim'
-Plug 'PotatoesMaster/i3-vim-syntax'
-call plug#end()
-
-set laststatus=2
-set noshowmode
+" Post plugin configuration
+highlight YcmErrorLine guibg=#550000
+highlight SyntasticError guibg=#550000
+highlight YcmWarningLine guibg=#555500
+highlight SyntasticWarning guibg=#555500
 
 " Key mappings
 silent! map <F2> :NERDTreeToggle<CR>
