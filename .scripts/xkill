@@ -1,3 +1,0 @@
-#!/bin/sh
-killid=$(xprop | grep _NET_WM_PID | awk '{ print $3 }')
-kill $killid
