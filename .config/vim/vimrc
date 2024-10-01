@@ -15,13 +15,13 @@ set viminfo+='1000,n$XDG_DATA_HOME/vim/viminfo
 set runtimepath=$XDG_CONFIG_HOME/vim,$VIMRUNTIME,$XDG_CONFIG_HOME/vim/after
 
 " Vundle Plugins
-set rtp+=$XDG_CONFIG_HOME/vim/bundle/vundle
+set rtp+=$XDG_CONFIG_HOME/vim/bundle/Vundle.vim
 call vundle#rc("$XDG_CONFIG_HOME/vim/bundle")
 call vundle#begin()
 Plugin 'gmarik/Vundle.vim'
 Plugin 'scrooloose/nerdtree'
 Plugin 'jiangmiao/auto-pairs'
-Plugin 'ycm-core/YouCompleteMe'
+" Plugin 'ycm-core/YouCompleteMe'
 Plugin 'itchyny/lightline.vim'
 call vundle#end()
 
